@@ -1,0 +1,12 @@
+{
+  "port": ":3000",
+  "logLevel": "debug",
+  "info": {
+    "apiversion": "1",
+    "author": "sufian",
+    "color": "#888444",
+    "head": "default",
+    "tail": "default",
+    "version": "0.0.1-beta"
+  }
+}
