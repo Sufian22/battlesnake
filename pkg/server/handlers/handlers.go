@@ -1,4 +1,4 @@
-package server
+package handlers
 
 import (
 	"encoding/json"
@@ -7,29 +7,12 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/BattlesnakeOfficial/rules/cli/commands"
-	"github.com/gorilla/mux"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/errors"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/middlewares"
+	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/errors"
+	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/models"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
 )
-
-func configureRouter(bs *BattlesnakeServer) http.Handler {
-	router := mux.NewRouter().StrictSlash(true)
-	router.Use(middlewares.LoggingMiddleware(bs.logger))
-
-	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
-
-	router.HandleFunc("/", GetInfoHandler(bs.logger, bs.config)).Methods("GET")
-	router.HandleFunc("/start", StartGameHandler(bs.logger, &bs.games)).Methods("POST")
-	router.HandleFunc("/move", MoveHandler(bs.logger, &bs.games)).Methods("POST")
-	router.HandleFunc("/end", EndGameHandler(bs.logger, &bs.games)).Methods("POST")
-
-	return router
-}
 
 func GetInfoHandler(logger *logrus.Logger, config config.ServerConfig) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -38,47 +21,48 @@ func GetInfoHandler(logger *logrus.Logger, config config.ServerConfig) func(w ht
 	}
 }
 
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
 func StartGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {
+	action := types.START_GAME
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req commands.ResponsePayload
+		var req models.StartGameRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			logger.Error(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{err.Error()})
+			json.NewEncoder(w).Encode(models.ErrorResponse{
+				Error: err.Error(),
+			})
 			return
 		}
 
-		// game types not typed
-		if req.Game.Ruleset.Name != "solo" {
-			err := errors.UnsupportedGameModeErr{}
+		if err := req.Game.Ruleset.Name.IsSupported(); err != nil {
 			logger.WithFields(logrus.Fields{
-				"action": types.START_GAME,
+				"action": action,
 				"mode":   req.Game.Ruleset.Name,
 			}).Error(err.Error())
 
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{err.Error()})
+			json.NewEncoder(w).Encode(models.ErrorResponse{
+				Error: err.Error(),
+			})
 			return
 		}
 
-		gameID := req.Game.Id
+		gameID := req.Game.ID
 		if _, ok := games.Load(gameID); ok {
 			err := errors.GameAlreadyStartedErr{}
 			logger.WithFields(logrus.Fields{
-				"action": types.START_GAME,
+				"action": action,
 				"gameID": gameID,
 			}).Error(err.Error(gameID))
 
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{err.Error(gameID)})
+			json.NewEncoder(w).Encode(models.ErrorResponse{
+				Error: err.Error(gameID),
+			})
 			return
 		}
 
-		games.Store(gameID, &commands.ResponsePayload{
+		games.Store(gameID, &models.GameRequest{
 			Game:  req.Game,
 			Turn:  0, // ignore turn from request because its a new game
 			Board: req.Board,
@@ -86,7 +70,7 @@ func StartGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Respon
 		})
 
 		logger.WithFields(logrus.Fields{
-			"action": types.START_GAME,
+			"action": action,
 			"gameID": gameID,
 			"mode":   req.Game.Ruleset.Name,
 		}).Info()
@@ -96,69 +80,75 @@ func StartGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Respon
 }
 
 func MoveHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {
+	action := types.MOVE
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req commands.ResponsePayload
+		var req models.MoveRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			logger.Error(err.Error())
 			return
 		}
 
-		gameID := req.Game.Id
+		gameID := req.Game.ID
 		if _, ok := games.Load(gameID); !ok {
 			err := errors.UnknownGameErr{}
 			logger.WithFields(logrus.Fields{
-				"action": types.END_GAME,
+				"action": action,
 			}).Error(err.Error(gameID))
 
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{err.Error(gameID)})
+			json.NewEncoder(w).Encode(models.ErrorResponse{
+				Error: err.Error(gameID),
+			})
 			return
 		}
 
-		// movements not typed
-		validMoves := []string{"up", "down", "left", "right"}
 		// random movements
-		movement := validMoves[rand.Intn(len(validMoves))]
+		movement := types.Movements[rand.Intn(len(types.Movements))]
 
 		logger.WithFields(logrus.Fields{
-			"action":   types.MOVE,
-			"snakeID":  req.You.Id,
+			"action":   action,
+			"snakeID":  req.You.ID,
 			"movement": movement,
 		}).Info()
 
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(commands.PlayerResponse{
-			Move:  string(movement),
+		json.NewEncoder(w).Encode(models.MoveResponse{
+			Move:  movement,
 			Shout: fmt.Sprintf("moving %s!", movement),
 		})
 	}
 }
 
 func EndGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {
+	action := types.END_GAME
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req commands.ResponsePayload
+		var req models.EndGameRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			logger.Error(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{err.Error()})
+			json.NewEncoder(w).Encode(models.ErrorResponse{
+				Error: err.Error(),
+			})
 			return
 		}
 
-		gameID := req.Game.Id
+		gameID := req.Game.ID
 		val, ok := games.Load(gameID)
 		if !ok {
 			err := errors.UnknownGameErr{}
 			logger.WithFields(logrus.Fields{
-				"action": types.END_GAME,
+				"action": action,
 			}).Error(err.Error(gameID))
 
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(ErrorResponse{err.Error(gameID)})
+			json.NewEncoder(w).Encode(models.ErrorResponse{
+				Error: err.Error(gameID),
+			})
 			return
 		}
 
-		game := val.(*commands.ResponsePayload)
+		game := val.(*models.GameRequest)
 		// evaluate game results
 		if len(game.Board.Food) > 0 {
 		}
@@ -166,7 +156,7 @@ func EndGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Response
 		games.Delete(gameID)
 
 		logger.WithFields(logrus.Fields{
-			"action": types.END_GAME,
+			"action": action,
 			"gameID": gameID,
 		}).Info()
 
