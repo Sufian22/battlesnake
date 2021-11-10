@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/errors"
+	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/metrics"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/models"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
 )
@@ -150,7 +152,13 @@ func EndGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Response
 
 		game := val.(*models.GameRequest)
 		// evaluate game results
-		if len(game.Board.Food) > 0 {
+		if game.Game.Ruleset.Name == types.Solo {
+			// snake performance on games
+			if len(game.Board.Food) > 0 {
+				metrics.TotalLosses.With(prometheus.Labels{"snakeID": game.You.ID}).Inc()
+			} else {
+				metrics.TotalWins.With(prometheus.Labels{"snakeID": game.You.ID}).Inc()
+			}
 		}
 
 		games.Delete(gameID)

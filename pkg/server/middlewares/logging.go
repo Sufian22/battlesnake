@@ -2,7 +2,6 @@ package middlewares
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/sirupsen/logrus"
 )
@@ -28,17 +27,14 @@ func (rw *responseWriter) WriteHeader(code int) {
 func LoggingMiddleware(logger *logrus.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-
 			w.Header().Set("Content-Type", "application/json")
 			wrapped := wrapResponseWriter(w)
 			next.ServeHTTP(wrapped, r)
 
 			logger.WithFields(logrus.Fields{
-				"status":  wrapped.status,
-				"method":  r.Method,
-				"path":    r.URL.EscapedPath(),
-				"latency": time.Since(start),
+				"status": wrapped.status,
+				"method": r.Method,
+				"path":   r.URL.EscapedPath(),
 			}).Info()
 		}
 

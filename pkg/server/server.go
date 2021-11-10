@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
@@ -43,14 +44,13 @@ func NewBattlesnakeServerFunc(logger *logrus.Logger) func(config.ServerConfig) (
 
 func configureRouter(bs *BattlesnakeServer) http.Handler {
 	router := mux.NewRouter().StrictSlash(true)
-	router.Use(middlewares.LoggingMiddleware(bs.logger))
-
-	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
+	router.Use(middlewares.MetricsMiddleware, middlewares.LoggingMiddleware(bs.logger))
 
 	router.HandleFunc("/", handlers.GetInfoHandler(bs.logger, bs.config)).Methods("GET")
 	router.HandleFunc("/start", handlers.StartGameHandler(bs.logger, &bs.games)).Methods("POST")
 	router.HandleFunc("/move", handlers.MoveHandler(bs.logger, &bs.games)).Methods("POST")
 	router.HandleFunc("/end", handlers.EndGameHandler(bs.logger, &bs.games)).Methods("POST")
+	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
 
 	return router
 }
