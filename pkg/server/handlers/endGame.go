@@ -14,11 +14,14 @@ import (
 )
 
 func EndGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {
-	action := types.END_GAME
+	loggerEntry := logger.WithFields(logrus.Fields{
+		"action": types.END_GAME,
+	})
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.EndGameRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			logger.Error(err.Error())
+			loggerEntry.Error(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(models.ErrorResponse{
 				Error: err.Error(),
@@ -30,9 +33,7 @@ func EndGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Response
 		val, ok := games.Load(gameID)
 		if !ok {
 			err := errors.UnknownGameErr{}
-			logger.WithFields(logrus.Fields{
-				"action": action,
-			}).Error(err.Error(gameID))
+			loggerEntry.Error(err.Error(gameID))
 
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(models.ErrorResponse{
@@ -54,8 +55,7 @@ func EndGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Response
 
 		games.Delete(gameID)
 
-		logger.WithFields(logrus.Fields{
-			"action": action,
+		loggerEntry.WithFields(logrus.Fields{
 			"gameID": gameID,
 		}).Info()
 

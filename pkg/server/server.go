@@ -6,20 +6,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gorilla/mux"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/handlers"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/middlewares"
 )
 
 type BattlesnakeServer struct {
 	config config.ServerConfig
 	games  sync.Map
 	server *http.Server
-	logger *logrus.Logger
+	logger *logrus.Logger // this could be a custom logger interface to avoid dependency
 }
 
 func NewBattlesnakeServerFunc(logger *logrus.Logger) func(config.ServerConfig) (*BattlesnakeServer, error) {
@@ -31,8 +26,9 @@ func NewBattlesnakeServerFunc(logger *logrus.Logger) func(config.ServerConfig) (
 		}
 
 		bs.server = &http.Server{
-			Addr:         config.Port,
-			Handler:      configureRouter(bs),
+			Addr:    config.Port,
+			Handler: NewRouter(bs),
+			// the following fields should be in the server configuration
 			ReadTimeout:  time.Second * 15,
 			WriteTimeout: time.Second * 15,
 			IdleTimeout:  time.Second * 60,
@@ -40,19 +36,6 @@ func NewBattlesnakeServerFunc(logger *logrus.Logger) func(config.ServerConfig) (
 
 		return bs, nil
 	}
-}
-
-func configureRouter(bs *BattlesnakeServer) http.Handler {
-	router := mux.NewRouter().StrictSlash(true)
-	router.Use(middlewares.MetricsMiddleware, middlewares.LoggingMiddleware(bs.logger))
-
-	router.HandleFunc("/", handlers.GetInfoHandler(bs.logger, bs.config)).Methods("GET")
-	router.HandleFunc("/start", handlers.StartGameHandler(bs.logger, &bs.games)).Methods("POST")
-	router.HandleFunc("/move", handlers.MoveHandler(bs.logger, &bs.games)).Methods("POST")
-	router.HandleFunc("/end", handlers.EndGameHandler(bs.logger, &bs.games)).Methods("POST")
-	router.Handle("/metrics", promhttp.Handler()).Methods("GET")
-
-	return router
 }
 
 func (bs *BattlesnakeServer) Start() error {

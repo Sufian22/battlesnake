@@ -8,5 +8,5 @@ type Coordinate struct {
 type Coordinates []Coordinate
 
 func (c *Coordinate) IsValid(height, width int32) bool {
-	return c.X >= 0 && c.Y >= 00 && c.X < width && c.Y < height
+	return c.X >= 0 && c.Y >= 0 && c.X < width && c.Y < height
 }

@@ -14,7 +14,10 @@ import (
 )
 
 func MoveHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {
-	action := types.MOVE
+	loggerEntry := logger.WithFields(logrus.Fields{
+		"action": types.MOVE,
+	})
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.MoveRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -26,9 +29,7 @@ func MoveHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWri
 		gameID := req.Game.ID
 		if _, ok := games.Load(gameID); !ok {
 			err := errors.UnknownGameErr{}
-			logger.WithFields(logrus.Fields{
-				"action": action,
-			}).Error(err.Error(gameID))
+			loggerEntry.Error(err.Error(gameID))
 
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(models.ErrorResponse{
@@ -37,8 +38,7 @@ func MoveHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWri
 			return
 		}
 
-		loggerEntry := logger.WithFields(logrus.Fields{
-			"action":  action,
+		loggerEntry = loggerEntry.WithFields(logrus.Fields{
 			"snakeID": req.You.ID,
 			"gameID":  req.Game.ID,
 		})
@@ -72,7 +72,7 @@ func calculateNextMovement(req models.MoveRequest) types.Movement {
 	}
 
 	validMovements := []types.Movement{}
-	for k, v := range types.Movements {
+	for k, v := range types.ValidMovementCoordinates {
 		nextCoordinate := types.Coordinate{
 			X: req.You.Head.X + v.X,
 			Y: req.You.Head.Y + v.Y,
@@ -82,7 +82,7 @@ func calculateNextMovement(req models.MoveRequest) types.Movement {
 			continue
 		}
 
-		if isNextMovementValid(forbiddenCells, nextCoordinate) {
+		if isNextMovementForbid(forbiddenCells, nextCoordinate) {
 			validMovements = append(validMovements, k)
 		}
 	}
@@ -95,7 +95,7 @@ func calculateNextMovement(req models.MoveRequest) types.Movement {
 	return movement
 }
 
-func isNextMovementValid(forbidden types.Coordinates, c types.Coordinate) bool {
+func isNextMovementForbid(forbidden types.Coordinates, c types.Coordinate) bool {
 	for _, v := range forbidden {
 		if v == c {
 			return false

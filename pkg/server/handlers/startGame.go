@@ -12,24 +12,14 @@ import (
 )
 
 func StartGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {
-	action := types.START_GAME
+	loggerEntry := logger.WithFields(logrus.Fields{
+		"action": types.START_GAME,
+	})
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.StartGameRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			logger.Error(err.Error())
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(models.ErrorResponse{
-				Error: err.Error(),
-			})
-			return
-		}
-
-		if err := req.Game.Ruleset.Name.IsSupported(); err != nil {
-			logger.WithFields(logrus.Fields{
-				"action": action,
-				"mode":   req.Game.Ruleset.Name,
-			}).Error(err.Error())
-
+			loggerEntry.Error(err.Error())
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(models.ErrorResponse{
 				Error: err.Error(),
@@ -38,12 +28,13 @@ func StartGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Respon
 		}
 
 		gameID := req.Game.ID
+		loggerEntry = loggerEntry.WithFields(logrus.Fields{
+			"gameID": gameID,
+		})
+
 		if _, ok := games.Load(gameID); ok {
 			err := errors.GameAlreadyStartedErr{}
-			logger.WithFields(logrus.Fields{
-				"action": action,
-				"gameID": gameID,
-			}).Error(err.Error(gameID))
+			loggerEntry.Error(err.Error(gameID))
 
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(models.ErrorResponse{
@@ -59,10 +50,8 @@ func StartGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.Respon
 			You:   req.You,
 		})
 
-		logger.WithFields(logrus.Fields{
-			"action": action,
-			"gameID": gameID,
-			"mode":   req.Game.Ruleset.Name,
+		loggerEntry.WithFields(logrus.Fields{
+			"mode": req.Game.Ruleset.Name,
 		}).Info()
 
 		w.WriteHeader(http.StatusOK)

@@ -15,7 +15,7 @@ const (
 	Right Movement = "right"
 )
 
-var Movements map[Movement]Coordinate = map[Movement]Coordinate{
+var ValidMovementCoordinates map[Movement]Coordinate = map[Movement]Coordinate{
 	Up: {
 		X: 0,
 		Y: 1,
@@ -50,8 +50,8 @@ func (m *Movement) UnmarshalJSON(b []byte) error {
 }
 
 func (m *Movement) IsValid() error {
-	switch *m {
-	case Up, Down, Left, Right:
+	_, ok := ValidMovementCoordinates[*m]
+	if ok {
 		return nil
 	}
 	return &errors.InvalidMovementErr{}
