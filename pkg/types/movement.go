@@ -15,7 +15,24 @@ const (
 	Right Movement = "right"
 )
 
-var Movements = []Movement{Up, Down, Left, Right}
+var Movements map[Movement]Coordinate = map[Movement]Coordinate{
+	Up: {
+		X: 0,
+		Y: 1,
+	},
+	Down: {
+		X: 0,
+		Y: -1,
+	},
+	Left: {
+		X: -1,
+		Y: 0,
+	},
+	Right: {
+		X: 1,
+		Y: 0,
+	},
+}
 
 func (m *Movement) UnmarshalJSON(b []byte) error {
 	var value string

@@ -55,3 +55,9 @@ type GameAlreadyStartedErr struct{}
 func (ga *GameAlreadyStartedErr) Error(id string) string {
 	return fmt.Sprintf("game with id %s has already been started", id)
 }
+
+type NoMovementErr struct{}
+
+func (n *NoMovementErr) Error() string {
+	return "no valid movement available"
+}

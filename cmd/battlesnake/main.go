@@ -33,6 +33,10 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	if !config.Info.Color.IsValid() {
+		logger.Fatal("invalid color set in configuration")
+	}
+
 	logLevel, err := logrus.ParseLevel(config.LogLevel)
 	if err != nil {
 		logger.Fatal(err)
