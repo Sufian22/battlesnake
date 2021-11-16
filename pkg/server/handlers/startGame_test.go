@@ -9,10 +9,10 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
-	"github.com/sufian22/battlesnake/pkg/models"
+	"github.com/sufian22/battlesnake/lib/battlesnake/models"
+	"github.com/sufian22/battlesnake/lib/battlesnake/types"
 	"github.com/sufian22/battlesnake/pkg/server/handlers"
 	httpModels "github.com/sufian22/battlesnake/pkg/server/models"
-	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func TestStartGameHandler(t *testing.T) {

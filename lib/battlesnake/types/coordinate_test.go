@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/sufian22/battlesnake/pkg/types"
+	"github.com/sufian22/battlesnake/lib/battlesnake/types"
 )
 
 func TestIsValid(t *testing.T) {

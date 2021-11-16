@@ -6,9 +6,9 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
+	"github.com/sufian22/battlesnake/lib/battlesnake/types"
 	"github.com/sufian22/battlesnake/pkg/server/errors"
 	"github.com/sufian22/battlesnake/pkg/server/models"
-	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func StartGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,6 @@
 package models
 
-import "github.com/sufian22/battlesnake/pkg/types"
+import "github.com/sufian22/battlesnake/lib/battlesnake/types"
 
 type Board struct {
 	Height  int32             `json:"height"`

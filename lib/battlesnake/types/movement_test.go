@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/sufian22/battlesnake/lib/battlesnake/types"
 	"github.com/sufian22/battlesnake/pkg/server/models"
-	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func TestMovementUnmarshalJSON(t *testing.T) {

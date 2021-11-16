@@ -1,6 +1,6 @@
 package models
 
-import "github.com/sufian22/battlesnake/pkg/models"
+import "github.com/sufian22/battlesnake/lib/battlesnake/models"
 
 type GameRequest struct {
 	Game  models.Game  `json:"game"`

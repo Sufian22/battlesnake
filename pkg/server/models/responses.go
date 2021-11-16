@@ -1,8 +1,8 @@
 package models
 
 import (
+	"github.com/sufian22/battlesnake/lib/battlesnake/types"
 	"github.com/sufian22/battlesnake/pkg/config"
-	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 type MoveResponse struct {
