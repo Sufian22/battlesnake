@@ -1,6 +1,6 @@
 package models
 
-import "gitlab.com/etoshi/testingroom/battlesnake/pkg/models"
+import "github.com/sufian22/battlesnake/pkg/models"
 
 type GameRequest struct {
 	Game  models.Game  `json:"game"`

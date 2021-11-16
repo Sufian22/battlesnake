@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/models"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
+	"github.com/sufian22/battlesnake/pkg/server/models"
+	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func TestMovementUnmarshalJSON(t *testing.T) {

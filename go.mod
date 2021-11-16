@@ -1,4 +1,4 @@
-module gitlab.com/etoshi/testingroom/battlesnake
+module github.com/sufian22/battlesnake
 
 go 1.16
 

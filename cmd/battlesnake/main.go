@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server"
+	"github.com/sufian22/battlesnake/pkg/config"
+	"github.com/sufian22/battlesnake/pkg/server"
 )
 
 func main() {

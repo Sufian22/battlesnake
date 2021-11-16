@@ -3,7 +3,7 @@ package types
 import (
 	"encoding/json"
 
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/errors"
+	"github.com/sufian22/battlesnake/pkg/server/errors"
 )
 
 type Movement string

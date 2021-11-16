@@ -8,10 +8,10 @@ import (
 	"sync"
 	"testing"
 
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/models"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/handlers"
-	httpModels "gitlab.com/etoshi/testingroom/battlesnake/pkg/server/models"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
+	"github.com/sufian22/battlesnake/pkg/models"
+	"github.com/sufian22/battlesnake/pkg/server/handlers"
+	httpModels "github.com/sufian22/battlesnake/pkg/server/models"
+	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func TestEndGameHandler(t *testing.T) {

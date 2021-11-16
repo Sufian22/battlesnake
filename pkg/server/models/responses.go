@@ -1,8 +1,8 @@
 package models
 
 import (
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
+	"github.com/sufian22/battlesnake/pkg/config"
+	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 type MoveResponse struct {

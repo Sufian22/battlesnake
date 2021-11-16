@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/handlers"
+	"github.com/sufian22/battlesnake/pkg/config"
+	"github.com/sufian22/battlesnake/pkg/server/handlers"
 )
 
 func TestGetInfoHandler(t *testing.T) {

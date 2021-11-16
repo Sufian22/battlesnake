@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/models"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server"
-	httpModels "gitlab.com/etoshi/testingroom/battlesnake/pkg/server/models"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
+	"github.com/sufian22/battlesnake/pkg/config"
+	"github.com/sufian22/battlesnake/pkg/models"
+	"github.com/sufian22/battlesnake/pkg/server"
+	httpModels "github.com/sufian22/battlesnake/pkg/server/models"
+	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func TestNewRouter(t *testing.T) {

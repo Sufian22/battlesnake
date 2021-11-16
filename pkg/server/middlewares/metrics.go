@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/metrics"
+	"github.com/sufian22/battlesnake/pkg/server/metrics"
 )
 
 func MetricsMiddleware(next http.Handler) http.Handler {

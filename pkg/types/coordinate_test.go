@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
+	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func TestIsValid(t *testing.T) {

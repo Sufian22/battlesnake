@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/config"
+	"github.com/sufian22/battlesnake/pkg/config"
 )
 
 func GetInfoHandler(logger *logrus.Logger, config config.ServerConfig) func(w http.ResponseWriter, r *http.Request) {

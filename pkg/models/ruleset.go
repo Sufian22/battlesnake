@@ -1,6 +1,6 @@
 package models
 
-import "gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
+import "github.com/sufian22/battlesnake/pkg/types"
 
 type Ruleset struct {
 	Name     types.GameMode  `json:"name"`

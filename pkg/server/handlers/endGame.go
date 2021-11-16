@@ -7,10 +7,10 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/errors"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/metrics"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/server/models"
-	"gitlab.com/etoshi/testingroom/battlesnake/pkg/types"
+	"github.com/sufian22/battlesnake/pkg/server/errors"
+	"github.com/sufian22/battlesnake/pkg/server/metrics"
+	"github.com/sufian22/battlesnake/pkg/server/models"
+	"github.com/sufian22/battlesnake/pkg/types"
 )
 
 func EndGameHandler(logger *logrus.Logger, games *sync.Map) func(w http.ResponseWriter, r *http.Request) {
