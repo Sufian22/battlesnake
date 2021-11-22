@@ -1,5 +1,7 @@
 # Battlesnake
 
+Battlesnake API (https://docs.battlesnake.com/references/api) server implementation. Follow the instructions to run the service and use the CLI against it!
+
 ## Prerequisites
 
 - Go: https://golang.org/dl/
